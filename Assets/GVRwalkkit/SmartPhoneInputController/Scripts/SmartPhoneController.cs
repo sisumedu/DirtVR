@@ -76,24 +76,24 @@ public class SmartPhoneInput : WebSocketService {
 	static public float PadGradY { get { return Mathf.Clamp(ny / -100f, -1, 1); }}
 	static public float PadGradZ { get { return Mathf.Clamp(nz / 100f, -1, 1); }}
 
-    static public float PadAcceX { get { return Mathf.Clamp(ax / 100f, -1, 1); } }
-    static public float PadAcceY { get { return Mathf.Clamp(ay / -100f, -1, 1); } }
-    static public float PadAcceZ { get { return Mathf.Clamp(az / 100f, -1, 1); } }
+    //static public float PadAcceX { get { return Mathf.Clamp(ax / 100f, -1, 1); } }
+    //static public float PadAcceY { get { return Mathf.Clamp(ay / -100f, -1, 1); } }
+    //static public float PadAcceZ { get { return Mathf.Clamp(az / 100f, -1, 1); } }
 
 
     static int x, y, nx, ny ,nz, ax, ay, az;
 
 	protected override void OnMessage(MessageEventArgs e) {
 		var values = e.Data.Split (',');
-		if (values.Length == 8) {
+		if (values.Length == 5) {
 			int.TryParse(values[0], out x);
 			int.TryParse(values[1], out y);
 			int.TryParse(values[2], out nx);
 			int.TryParse(values[3], out ny);
 			int.TryParse(values[4], out nz);
-            int.TryParse(values[5], out ax);
-            int.TryParse(values[6], out ay);
-            int.TryParse(values[7], out az);
+            //int.TryParse(values[5], out ax);
+            //int.TryParse(values[6], out ay);
+            //int.TryParse(values[7], out az);
         }
 	}
 

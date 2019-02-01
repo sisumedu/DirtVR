@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -22,7 +22,7 @@
     var controllerState = {
       x: 0, y: 0,
       nx: 0, ny: 0, nz: -1
-	  ax: 0, ay: 0,az: 0
+	  
     };
 
     var eventName = {
@@ -73,9 +73,9 @@
       var x = evt.acceleration.x; // X方向の加速度
       var y = evt.acceleration.y; // Y方向の加速度
       var z = evt.acceleration.z; // Z方向の加速度
-      var xg = evt.accelerationIncludingGravity.x; // X方向の傾き
-      var yg = evt.accelerationIncludingGravity.y; // Y方向の傾き
-      var zg = evt.accelerationIncludingGravity.z; // Z方向の傾き
+        var xg = evt.accelerationIncludingGravity.x; // X方向の傾き
+        var yg = evt.accelerationIncludingGravity.y; // Y方向の傾き
+        var zg = evt.accelerationIncludingGravity.z; // Z方向の傾き
       // 左右への傾き: nx [-1, 1], -1 左に完全に傾いている
       // 前後への傾き: ny [-1, 1], -1 普通に縦を上に持っている、 1 逆さに持っている
       // 表が上:  nz = -1, 表が下 nz = 1
@@ -87,9 +87,7 @@
       controllerState.ny = Math.floor(ny*100);
       controllerState.nz = Math.floor(nz*100);
 
-	  controllerState.ax = x;
-      controllerState.ay = y;
-      controllerState.az = z;
+	  
     });
 
     var ws;
@@ -133,7 +131,7 @@
 
     function send() {
       var s = controllerState;
-      var m = [s.x, s.y, s.nx, s.ny, s.nz, s.ax, s.ay, s.az].join(",");
+      var m = [s.x, s.y, s.nx, s.ny, s.nz].join(",");
       if (ws.readyState == ws.OPEN) {
         ws.send(m);
         debug(m);

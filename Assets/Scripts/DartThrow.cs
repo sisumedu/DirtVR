@@ -8,9 +8,20 @@ public class DartThrow : MonoBehaviour
     int[] scores = { 20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5 };
     int points = 0;
     WebSocketinputDart webSocketinputDart;
+    private bool throwD;
+    public int throwCount;
+    public GameObject Dart;
+    GameObject GameScript;
+    //Test test;
 
     void Start()
     {
+        if (tag == "Re")
+        { tag = "Untagged"; }
+        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+        GameScript = GameObject.Find("PointScript");
+        if (throwCount >= 24)
+        { tag = "Finish"; }
     }
 
     void Update()
@@ -26,10 +37,15 @@ public class DartThrow : MonoBehaviour
                 Vector3 direction = new Vector3(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"), 0);
                 transform.Translate(direction * DragSpeed * Time.deltaTime);
             }
+        
+        //スクリプトをつけたオブジェクトに角度をつける
+        transform.rotation = Quaternion.Euler(SmartPhoneInput.PadGradX*10, SmartPhoneInput.PadGradY*10, SmartPhoneInput.PadGradZ*10);
 
 
-
+        
     }
+
+
 
     void FixedUpdate()
     {
@@ -43,29 +59,52 @@ public class DartThrow : MonoBehaviour
             GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * ThrowSpeed, ForceMode.Impulse);
 
 
-        webSocketinputDart.PHONE_attack02_dart();
+        //webSocketinputDart.PHONE_attack02_dart();
 
-        if (SmartPhoneInput.PadAcceX > 4)
-            GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * 5, ForceMode.Impulse);
+       Debug.Log("SmartPhoneInput.PadGradY = " + SmartPhoneInput.PadGradY);
+        if (SmartPhoneInput.PadGradY> 0.5 && SmartPhoneInput.PadX == 0) {  GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * 5, ForceMode.Impulse); }
 
+       
+
+        //if (throwD)
+        //{ GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * 5, ForceMode.Impulse); }
+        
     }
 
-    void OnCollisionEnter()
+     void OnCollisionEnter(Collision collision)
     {
-        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
-        AddPoints();
-        tag = "Finish";
+
+        if (collision.gameObject.CompareTag("Player"))   //もしプレイヤータグと接触したら...
+        {
+
+
+            Debug.Log(collision.gameObject.name + "と衝突しました!!!");
+            GameScript.GetComponent<Points>().AddPoints();
+            throwCount = throwCount + 1;
+            var obj=Instantiate(Dart, new Vector3(0, 0, -10), Quaternion.identity) as GameObject;
+            obj.name = Dart.name;
+            GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+
+          
+            
+            //tag = "Respawn";
+            tag = "Re"; 
+            Destroy(this.gameObject);
+        }
+
+       
     }
 
-    private
 
-    void AddPoints()
-    {
-        points += CountPoints();
-        Score.GetComponent<GUIText>().text = points.ToString();
-    }
 
-    int CountPoints()
+    //void AddPoints()
+    //{
+    //    throwCount++;
+    //    points += CountPoints();
+    //    Score.GetComponent<GUIText>().text = points.ToString();
+    //}
+
+    public int CountPoints()
     {
         Vector2 v = new Vector2(transform.position.x, transform.position.y);
 

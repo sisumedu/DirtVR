@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>加速度センサーの値を取る</title>
+    <style>
+        @import url(http://fonts.googleapis.com/earlyaccess/notosansjapanese.css);
+
+        html, body {
+            font-size: 18px;
+            font-family: 'Noto Sans Japanese', sans-serif;
+            text-align: center;
+            background-color: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>重力加速度を除いた加速度 加速度 回転速度</h1>
+    </header>
+    <main>
+        <div>
+            <div id="acceleration">
+                <h2>acceleration[m/s^2]</h2>
+                <p>x: <span id="acc-x"></span></p>
+                <p>y: <span id="acc-y"></span></p>
+                <p>z: <span id="acc-z"></span></p>
+            </div>
+            <div id="accelerationIncludingGravity">
+                <h2>accelerationIncludingGravity[m/s^2]</h2>
+                <p>x: <span id="acc-gx"></span></p>
+                <p>y: <span id="acc-gy"></span></p>
+                <p>z: <span id="acc-gz"></span></p>
+            </div>
+            <div id="rotationRate">
+                <h2>rotationRate[degree/s]</h2>
+                <p>a: <span id="rr-a"></span></p>
+                <p>b: <span id="rr-b"></span></p>
+                <p>g: <span id="rr-g"></span></p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const url = "WEBSOCKET_BASE/p1";
+
+        var controllerState = {
+            x: 0, y: 0,z : 0,
+            nx: 0, ny: 0, nz: -1,
+            ax: 0, ay: 0, az: 0
+        };
+        (function () {
+            window.addEventListener("devicemotion", function (e) {
+                //加速度
+                var acc = e.acceleration;
+                controllerState.x = obj2NumberFix(acc.x, 5);
+                controllerState.y = obj2NumberFix(acc.y, 5);
+                controllerState.z = obj2NumberFix(acc.z, 5);
+                //傾き(重力加速度)
+                var acc_g = e.accelerationIncludingGravity;
+                controllerState.nx = obj2NumberFix(acc_g.x, 5);
+                controllerState.ny = obj2NumberFix(acc_g.y, 5);
+                controllerState.nz = obj2NumberFix(acc_g.z, 5);
+                //回転値
+                var rota_r = e.rotationRate;
+                controllerState.ax = obj2NumberFix(rota_r.alpha, 5); //z方向
+                controllerState.ay = obj2NumberFix(rota_r.beta, 5); //x方向
+                controllerState.az = obj2NumberFix(rota_r.gamma, 5); // y方向
+                //表示
+                print3('acc-x', x, 'acc-y', y, 'acc-z', z); //加速度
+                print3('acc-gx', gx, 'acc-gy', gy, 'acc-gz', gz); //傾き
+                print3('rr-a', a, 'rr-b', b, 'rr-g', g); //回転値
+                // function
+                function obj2NumberFix(obj, fix_deg) {
+                    return Number(obj).toFixed(fix_deg);
+                }
+                function print3(id1, value1, id2, value2, id3, value3) {
+                    print1(id1, value1);
+                    print1(id2, value2);
+                    print1(id3, value3);
+                }
+                function print1(id, value) {
+                    var id_obj = document.getElementById(id);
+                    id_obj.innerHTML = value;
+                }
+            });
+        })();
+
+        var ws;
+        wsConnect();
+        function wsConnect() {
+            // FireFoxとの互換性を考慮してインスタンス化
+            if ("WebSocket" in window) {
+                ws = new WebSocket(url);
+            } else if ("MozWebSocket" in window) {
+                ws = new MozWebSocket(url);
+            }
+
+            // メッセージ受信時のコールバック関数
+            ws.onmessage = function (event) {
+                debug(event.data);
+            }
+
+            ws.onopen = function () {
+                debug("CONNECTED");
+                send();
+            }
+
+            ws.onclose = function () {
+                console.log("onclose");
+                debug("DISCONNECTED");
+                // setTimeout(wsConnect, 3000);
+            }
+        }
+
+        // 終了時に明示的に接続を閉じる
+        window.onunload = function () {
+            var code = 4500;
+            var reason = "client closed";
+            ws.close(code, reason);
+        }
+
+        function debug(text) {
+            pad.innerText = text;
+        }
+
+        function send() {
+            var s = controllerState;
+            var m = [s.x, s.y, s.nx, s.ny, s.nz, s.ax, s.ay, s.az].join(",");
+            if (ws.readyState == ws.OPEN) {
+                ws.send(m);
+                debug(m);
+                setTimeout(send, 100);
+            }
+        }
+
+
+
+    </script>
+</body>
+</html>
