@@ -13,7 +13,7 @@ public class DartThrow : MonoBehaviour
     public GameObject Dart;
     GameObject GameScript;
     //Test test;
-
+    ArrowObject arrowObject;
     void Start()
     {
         if (tag == "Re")
@@ -39,7 +39,7 @@ public class DartThrow : MonoBehaviour
             }
         
         //スクリプトをつけたオブジェクトに角度をつける
-        transform.rotation = Quaternion.Euler(SmartPhoneInput.PadGradX*10, SmartPhoneInput.PadGradY*10, SmartPhoneInput.PadGradZ*10);
+        transform.rotation = Quaternion.Euler(SmartPhoneInput.PadGradX*100, SmartPhoneInput.PadGradY*100, SmartPhoneInput.PadGradZ*100);
 
 
         
@@ -56,13 +56,19 @@ public class DartThrow : MonoBehaviour
 
         }
         if (Input.GetMouseButtonUp(0) )
-            GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * ThrowSpeed, ForceMode.Impulse);
-
+            //GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * ThrowSpeed, ForceMode.Impulse);
+            transform.LookAt(GetComponent<Rigidbody>().velocity.normalized);
+            //arrowObject.Shot(Vector3.forward * ThrowSpeed);
 
         //webSocketinputDart.PHONE_attack02_dart();
 
-       Debug.Log("SmartPhoneInput.PadGradY = " + SmartPhoneInput.PadGradY);
-        if (SmartPhoneInput.PadGradY> 0.5 && SmartPhoneInput.PadX == 0) {  GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * 5, ForceMode.Impulse); }
+        Debug.Log("SmartPhoneInput.PadGradY = " + SmartPhoneInput.PadGradY);
+        if (SmartPhoneInput.PadGradY> 0.5 && SmartPhoneInput.PadX == 0)
+        {
+            //GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * 5, ForceMode.Impulse); 
+            //arrowObject.Shot(Vector3.forward * 20* SmartPhoneInput.PadGradY);
+            transform.LookAt(GetComponent<Rigidbody>().velocity.normalized);
+        }
 
        
 
