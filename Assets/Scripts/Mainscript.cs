@@ -9,7 +9,7 @@ public class Mainscript : MonoBehaviour
     GameObject[] tagObjects;
 
     public GameObject Dart;
-    public int score_num;
+    //public int score_num;
     
     // Start is called before the first frame update
     void Start()

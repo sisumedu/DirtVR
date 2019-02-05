@@ -18,9 +18,11 @@ public class DartThrow : MonoBehaviour
     ArrowObject arrowObject;
     GameObject arrow;
 
+     private Rigidbody rb;
+
     float padx = 50;
-     float pady = 100;
-     float padz = 1000;
+    float pady = 100;
+    float padz = 1000;
 
     void Start()
     {
@@ -31,7 +33,12 @@ public class DartThrow : MonoBehaviour
         arrow = GameObject.Find("Dart");
         if (throwCount >= 24)
         { tag = "Finish"; }
-        GetComponent<Rigidbody>().useGravity = false;
+
+        rb = GetComponent<Rigidbody>();
+
+        rb.useGravity = false;
+        throwD = false;
+        
     }
 
     void Update()
@@ -47,10 +54,11 @@ public class DartThrow : MonoBehaviour
                 Vector3 direction = new Vector3(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"), 0);
                 transform.Translate(direction * DragSpeed * Time.deltaTime);
             }
-
-        //スクリプトをつけたオブジェクトに角度をつける
-         //transform.rotation = Quaternion.Euler(SmartPhoneInput.PadGradY*padx, SmartPhoneInput.PadGradZ*pady, SmartPhoneInput.PadGradX*padz).normalized;
-
+        if (!throwD)
+        {
+            //スクリプトをつけたオブジェクトに角度をつける
+            //transform.rotation = Quaternion.Euler(SmartPhoneInput.PadGradY * padx, SmartPhoneInput.PadGradZ * pady, SmartPhoneInput.PadGradX * padz).normalized;
+        }
        
 
     }
@@ -66,35 +74,52 @@ public class DartThrow : MonoBehaviour
 
 
         }
-        if (Input.GetMouseButtonUp(0) )
+        if (Input.GetMouseButtonUp(0))
+        {
             GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * ThrowSpeed, ForceMode.Impulse);
             transform.LookAt(GetComponent<Rigidbody>().velocity.normalized);
             //arrowObject.Shot(Vector3.forward * ThrowSpeed);
-
+            GetComponent<Rigidbody>().useGravity = true;
+        }
         //webSocketinputDart.PHONE_attack02_dart();
 
-        Debug.Log("SmartPhoneInput.PadGradY = " + SmartPhoneInput.PadGradY);
-        if (SmartPhoneInput.PadGradY> 0.5 && SmartPhoneInput.PadX == 0)
-        {
 
-            var velocity = arrow.GetComponent<AccelerationScript>().CalcVelocity();
-            GetComponent<Rigidbody>().velocity = velocity;
-            GetComponent<Rigidbody>().useGravity = true;
+        Debug.Log("SmartPhoneInput.PadGradY = " + SmartPhoneInput.PadGradY);
+        if (SmartPhoneInput.PadGradY> 0.4 && SmartPhoneInput.PadX == 0)
+        {
+            throwD = true;
+            //var velocity = accelerationScript.CalcVelocity();
+            //var velocity = arrow.GetComponent<AccelerationScript>().CalcVelocity();
+            //rb.velocity = velocity;
+            rb.useGravity = true;
+            //transform.LookAt(GetComponent<Rigidbody>().velocity.normalized);
             //Vector3 ko = new Vector3(0,0, SmartPhoneInput.PadGradY);
-            GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * 5* SmartPhoneInput.PadGradY, ForceMode.Impulse); 
+            GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * ThrowSpeed * SmartPhoneInput.PadGradY, ForceMode.Impulse);
+            //GetComponent<Rigidbody>().AddRelativeForce(new Vector3(SmartPhoneInput.PadGradX * padz, SmartPhoneInput.PadGradY , SmartPhoneInput.PadGradZ * pady), ForceMode.Impulse);
             //arrowObject.Shot(Vector3.forward * 20* SmartPhoneInput.PadGradY);
             //transform.LookAt(GetComponent<Rigidbody>().velocity.normalized);
             //arrowObject.Shot(ko);
+            //Arrowangle();
 
 
         }
 
        
-
-        //if (throwD)
-        //{ GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * 5, ForceMode.Impulse); }
-        
     }
+
+        private void Arrowangle()
+        {
+            float angularVelocity = Random.Range(-100, 100);
+            // 進行方向を向かせる
+            var look = Quaternion.LookRotation(rb.velocity);
+            var z = transform.eulerAngles.z;
+            var angle = Quaternion.Euler(0, 0, z + angularVelocity * Time.deltaTime);
+            transform.rotation = angle;
+        }
+    //if (throwD)
+    //{ GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * 5, ForceMode.Impulse); }
+
+
 
      void OnCollisionEnter(Collision collision)
     {
