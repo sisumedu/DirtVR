@@ -8,20 +8,30 @@ public class DartThrow : MonoBehaviour
     int[] scores = { 20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5 };
     int points = 0;
     WebSocketinputDart webSocketinputDart;
+    
+
     private bool throwD;
     public int throwCount;
     public GameObject Dart;
     GameObject GameScript;
     //Test test;
     ArrowObject arrowObject;
+    GameObject arrow;
+
+    float padx = 50;
+     float pady = 100;
+     float padz = 1000;
+
     void Start()
     {
         if (tag == "Re")
         { tag = "Untagged"; }
         GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
         GameScript = GameObject.Find("PointScript");
+        arrow = GameObject.Find("Dart");
         if (throwCount >= 24)
         { tag = "Finish"; }
+        GetComponent<Rigidbody>().useGravity = false;
     }
 
     void Update()
@@ -37,15 +47,16 @@ public class DartThrow : MonoBehaviour
                 Vector3 direction = new Vector3(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"), 0);
                 transform.Translate(direction * DragSpeed * Time.deltaTime);
             }
-        
+
         //スクリプトをつけたオブジェクトに角度をつける
-        transform.rotation = Quaternion.Euler(SmartPhoneInput.PadGradX*100, SmartPhoneInput.PadGradY*100, SmartPhoneInput.PadGradZ*100);
+         //transform.rotation = Quaternion.Euler(SmartPhoneInput.PadGradY*padx, SmartPhoneInput.PadGradZ*pady, SmartPhoneInput.PadGradX*padz).normalized;
 
+       
 
-        
     }
 
-
+    [SerializeField]
+    private AccelerationScript accelerationScript;
 
     void FixedUpdate()
     {
@@ -56,7 +67,7 @@ public class DartThrow : MonoBehaviour
 
         }
         if (Input.GetMouseButtonUp(0) )
-            //GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * ThrowSpeed, ForceMode.Impulse);
+            GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * ThrowSpeed, ForceMode.Impulse);
             transform.LookAt(GetComponent<Rigidbody>().velocity.normalized);
             //arrowObject.Shot(Vector3.forward * ThrowSpeed);
 
@@ -65,9 +76,17 @@ public class DartThrow : MonoBehaviour
         Debug.Log("SmartPhoneInput.PadGradY = " + SmartPhoneInput.PadGradY);
         if (SmartPhoneInput.PadGradY> 0.5 && SmartPhoneInput.PadX == 0)
         {
-            //GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * 5, ForceMode.Impulse); 
+
+            var velocity = arrow.GetComponent<AccelerationScript>().CalcVelocity();
+            GetComponent<Rigidbody>().velocity = velocity;
+            GetComponent<Rigidbody>().useGravity = true;
+            //Vector3 ko = new Vector3(0,0, SmartPhoneInput.PadGradY);
+            GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * 5* SmartPhoneInput.PadGradY, ForceMode.Impulse); 
             //arrowObject.Shot(Vector3.forward * 20* SmartPhoneInput.PadGradY);
-            transform.LookAt(GetComponent<Rigidbody>().velocity.normalized);
+            //transform.LookAt(GetComponent<Rigidbody>().velocity.normalized);
+            //arrowObject.Shot(ko);
+
+
         }
 
        
